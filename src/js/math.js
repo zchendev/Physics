@@ -38,6 +38,14 @@ class Vector {
     cross(vector) {
         return this.x * vector.y - this.y * vector.x;
     }
+
+    render(context, x, y, n) {
+        context.beginPath();
+        context.moveTo(x, y);
+        context.lineTo(x + this.x * n, y + this.y * n);
+        context.stroke();
+        context.closePath();
+    }
 }
 
 class Matrix {

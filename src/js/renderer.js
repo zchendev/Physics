@@ -16,17 +16,40 @@ function update() {
     // const start = performance.now();
 
     context.clearRect(0, 0, width, height)
+    collisions.length = 0;
 
     for (let i = 0; i < composites.length; i++) {
         composite = composites[i];
         if (composite.controllable) update_controls(composite);
-        if (!composite.f) composite.entity.v = composite.entity.v.add({x: 0, y: 0.01});
         composite.update();
+        composite.entity.v.y += 0.1;
+    }
+
+    for (let i = 0; i < composites.length; i++) {
+        composite = composites[i];
         for (let j = i + 1; j < composites.length; j++) {
-            const collision = new Collision(composite, composites[j]);
-            collision.solve();
+            let c = {
+                penetration: null,
+                axis: null,
+                vertex: null,
+            }
+            const fc = Collision.hst(composite, composites[j]);
+            if (fc.penetration > c.penetration) {
+                c = fc;
+            }
+
+            if (c.penetration != null) {
+                composite.entity.v.y -= 0.1;
+                collisions.push(new Collision(composite, composites[j], c.axis, c.vertex, c.penetration));
+            }
         }
+
         composite.render(context);
+    }
+
+    for (let i = 0; i < collisions.length; i++) {
+        collisions[i].pr();
+        collisions[i].cr();
     }
 
     calculate();
@@ -62,15 +85,15 @@ function calculate() {
 // composites.push(new BaseCircle(20, 20, 10, 50, false));
 // composites.push(new BaseCircle(200, 200, 20, 50, false));
 // composites.push(new BaseCircle(500, 200, 5, 50, false));
-// composites.push(new BaseSegment(0, 0, 0, height));
-// composites.push(new BaseSegment(0, 0, width, 0));
-// composites.push(new BaseSegment(width, 0, width, height));
-// composites.push(new BaseSegment(0, height, width, height));
+composites.push(new BaseSegment(0, 0, 0, height));
+composites.push(new BaseSegment(0, 0, width, 0));
+composites.push(new BaseSegment(width, 0, width, height));
+composites.push(new BaseSegment(0, height, width, height));
 // composites.push(new BaseSegment(100, 100, 200, 200));
-composites.push(new BaseRectangle(200, 500, 400, 100, 5, true))
-composites.push(new BaseRectangle(200, 400, 400, 100, 5, false))
+composites.push(new BaseRectangle(300, 200, 400, 100, 5, true))
+composites.push(new BaseRectangle(450, 300, 50, 100, 10, false))
 // composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
-composites.push(new BaseRectangle(width / 2, height, width, 1, Infinity, false, true))
+// composites.push(new BaseRectangle(width / 2, height, width, 1, Infinity, false, true))
 // composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
 // composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
 
