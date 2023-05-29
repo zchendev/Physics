@@ -17,28 +17,35 @@ function update() {
 
     context.clearRect(0, 0, width, height)
 
-    for (let i = 0; i < composites.length; i++) {
-        composite = composites[i];
-        if (composite.controllable) update_controls(composite);
-        if (!composite.f) composite.entity.a.y = 0.2;
-        composite.update();
-        for (let j = i + 1; j < composites.length; j++) {
-            const collision = new Collision(composite, composites[j]);
-            collision.solve();
-        }
-        composite.render(context);
-    }
+    // for (let i = 0; i < composites.length; i++) {
+    //     composite = composites[i];
+    //     if (composite.controllable) update_controls(composite);
+    //     composite.update();
+    //     for (let j = i + 1; j < composites.length; j++) {
+    //         const collision = new Collision(composite, composites[j]);
+    //         collision.solve();
+    //     }
+    //     composite.render(context);
+    // }
 
     calculate();
 
-    // for (i in composites) {
-    //     for (let j = 0; j < i; j++) {
-    //         if (Collision.collision.cd[composites[i].type][composites[j].type](composites[i], composites[j])) {
-    //             Collision.collision.pr[composites[i].type][composites[j].type](composites[i], composites[j]);
-    //             Collision.collision.cr[composites[i].type][composites[j].type](composites[i], composites[j]);
-    //         }
-    //     }
-    // }
+    for (i in composites) {
+
+        composite = composites[i];
+
+        if (composite.controllable) update_controls(composite);
+        composite.update();
+        
+        for (let j = 0; j < i; j++) {
+            if (Collision.collision.cd[composites[i].type][composites[j].type](composites[i], composites[j])) {
+                Collision.collision.pr[composites[i].type][composites[j].type](composites[i], composites[j]);
+                Collision.collision.cr[composites[i].type][composites[j].type](composites[i], composites[j]);
+            }
+        }
+
+        composite.render(context);
+    }
 
     // pr.innerHTML = "Loop Instance Time: " + (performance.now() - start).toFixed(2);
 
@@ -59,18 +66,22 @@ function calculate() {
     py.innerHTML = "Momentum Y: " + my.toFixed(2);
 }
 
-// composites.push(new BaseCircle(20, 20, 10, 50, false));
-// composites.push(new BaseCircle(200, 200, 20, 50, false));
-// composites.push(new BaseCircle(500, 200, 5, 50, false));
-// composites.push(new BaseSegment(0, 0, 0, height));
-// composites.push(new BaseSegment(0, 0, width, 0));
-// composites.push(new BaseSegment(width, 0, width, height));
-// composites.push(new BaseSegment(0, height, width, height));
+canvas.addEventListener("mousedown", e => {
+    composites.push(new BaseCircle(e.x, e.y, 10, 50, false))
+}) 
+
+composites.push(new BaseCircle(20, 20, 10, 50, true));
+composites.push(new BaseCircle(200, 200, 20, 50, false));
+composites.push(new BaseCircle(500, 200, 5, 50, false));
+composites.push(new BaseSegment(0, 0, 0, height));
+composites.push(new BaseSegment(0, 0, width, 0));
+composites.push(new BaseSegment(width, 0, width, height));
+composites.push(new BaseSegment(0, height, width, height));
 // composites.push(new BaseSegment(100, 100, 200, 200));
-composites.push(new BaseRectangle(200, 300, 100, 50, 5, true))
-composites.push(new BaseRectangle(400, 300, 100, 50, 5, false))
+// composites.push(new BaseRectangle(200, 300, 100, 50, 5, true))
+// composites.push(new BaseRectangle(400, 300, 100, 50, 5, false))
 // composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
-composites.push(new BaseRectangle(width / 2, height, width, 1, Infinity, false, true))
+// composites.push(new BaseRectangle(width / 2, height, width, 1, Infinity, false, true))
 // composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
 // composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
 

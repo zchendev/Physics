@@ -185,7 +185,7 @@ class Collision {
                 min_axis = axes[i];
                 if (i < separation){
                     vo = b;
-                    if (p1.max > p2.max) min_axis = axes[i].multiply(-1);
+                    if (p1.max < p2.max) min_axis = axes[i].multiply(-1);
                 } else {
                     vo = a;
                     if (p1.max < p2.max) min_axis = axes[i].multiply(-1);
@@ -348,6 +348,7 @@ class BaseSegment {
         this.entity.d = this.b.subtract(this.a).unit();
         this.v[0] = this.a;
         this.v[1] = this.b;
+        this.μ = 0;
 
         this.reference = this.b.subtract(this.a).unit();
     }
