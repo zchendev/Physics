@@ -1,8 +1,7 @@
 const composites = [];
-const collisions = [];
 const config = {
     physics: {
-        friction: 0.04,
+        friction: 0.01,
         elasticity: 0,
     },
 }
@@ -118,7 +117,7 @@ class Collision {
             return axes;
         }
 
-        if (b instanceof BaseCircle){
+        if(b instanceof BaseCircle){
             axes.push(Collision.min_v(a, b.entity.p).subtract(b.entity.p).unit());
             axes.push(a.entity.d.normal().unit());
             if (a instanceof BaseRectangle) axes.push(a.entity.d);
@@ -194,8 +193,6 @@ class Collision {
             }
         }
 
-        if (vo === b) min_axis = min_axis.multiply(-1);
-
         return {
             penetration: min,
             axis: min_axis,
@@ -228,24 +225,15 @@ class Collision {
         }
     }
 
-    constructor(a, b, x, v, p) {
+    constructor(a, b) {
         this.a = a;
         this.b = b;
-        this.x = x;
-        this.v = v;
-        this.p = p;
     }
 
     solve() {
+        if (!this.cd()) return;
         this.pr();
         this.cr();
-    }
-
-    static cd_g(a, b) {
-        if (a.entity.i == 0 && b.entity.i == 0) return;
-        const c = Collision.hst(a, b);
-        if (c) return c;
-        return false;
     }
 
     cd() {
@@ -369,11 +357,10 @@ class BaseSegment {
         this.c = this.a.add(this.b).multiply(0.5);
         this.l = this.b.subtract(this.a).magnitude();
         this.v = [];
-        this.entity = new Entity(this.c.x, this.c.y, Infinity)
+        this.entity = new Entity(this.c.x, this.c.y, 1)
         this.entity.d = this.b.subtract(this.a).unit();
         this.v[0] = this.a;
         this.v[1] = this.b;
-        this.μ = 0;
 
         this.reference = this.b.subtract(this.a).unit();
     }
@@ -385,7 +372,7 @@ class BaseSegment {
         // this.a = this.c.add(rotation.multiply(this.l * -0.5));
         // this.b = this.c.add(rotation.multiply(this.l * 0.5));
         context.beginPath();
-        context.strokeStyle = "red";
+        context.strokeStyle = "black";
         context.moveTo(this.a.x, this.a.y);
         context.lineTo(this.b.x, this.b.y);
         context.stroke();
@@ -393,8 +380,35 @@ class BaseSegment {
     }
 }
 
+// class BaseLine {
+//     constructor(x1, y1, x2, y2) {
+//         this.a = new Vector(x1, y1); // start
+//         this.b = new Vector(x2, y2); // end
+//         this.v = [this.a, this.b]; // vertices
+//         this.c = this.a.add(this.b).multiply(0.5); // center
+//         this.l = this.b.subtract(this.a).magnitude(); // length
+
+//         this.reference = this.b.subtract(this.a).unit();
+//         this.slope = (y2 - y1) / (x2 - x1);
+//     }
+
+//     update(){};
+
+//     render(context) {
+//         // const rotation = Matrix.rotation_matrix(this.θ).multiply_vector(this.reference);
+//         // this.a = this.c.add(rotation.multiply(this.l * -0.5));
+//         // this.b = this.c.add(rotation.multiply(this.l * 0.5));
+//         context.beginPath();
+//         context.strokeStyle = "black";
+//         context.moveTo(this.a.x, this.a.y);
+//         context.lineTo(this.b.x, this.b.y);
+//         context.stroke();
+//         context.closePath();
+//     }
+// }
+
 class BaseRectangle {
-    constructor(x, y, w, h, m, controllable = false) {
+    constructor(x, y, w, h, m, controllable = false, floor = false) {
         this.x = x; // center x
         this.y = y; // center y
         this.w = w; // width
@@ -407,6 +421,7 @@ class BaseRectangle {
         this.entity = new Entity(this.x, this.y, m);
         this.μ = 1 / (m * (this.w ** 2 + this.h ** 2) / 12);
         this.controllable = controllable;
+        this.f = floor;
     }
 
     update() {
@@ -415,7 +430,6 @@ class BaseRectangle {
         this.v[1] = this.entity.p.add(this.entity.d.multiply(-this.w / 2).add(this.entity.d.normal().unit().multiply(-this.h / 2)))
         this.v[2] = this.entity.p.add(this.entity.d.multiply(this.w / 2).add(this.entity.d.normal().unit().multiply(-this.h / 2)))
         this.v[3] = this.entity.p.add(this.entity.d.multiply(this.w / 2).add(this.entity.d.normal().unit().multiply(this.h / 2)))
-        this.entity.v.render(context, this.entity.p.x, this.entity.p.y, 10);
     }
 
     render(context) {
