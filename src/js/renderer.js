@@ -20,7 +20,7 @@ function update() {
     for (let i = 0; i < composites.length; i++) {
         composite = composites[i];
         if (composite.controllable) update_controls(composite);
-        if (!composite.f) composite.entity.v = composite.entity.v.add({x: 0, y: 0.01});
+        if (!composite.f) composite.entity.a.y = 0.2;
         composite.update();
         for (let j = i + 1; j < composites.length; j++) {
             const collision = new Collision(composite, composites[j]);
@@ -67,8 +67,8 @@ function calculate() {
 // composites.push(new BaseSegment(width, 0, width, height));
 // composites.push(new BaseSegment(0, height, width, height));
 // composites.push(new BaseSegment(100, 100, 200, 200));
-composites.push(new BaseRectangle(200, 500, 400, 100, 5, true))
-composites.push(new BaseRectangle(200, 400, 400, 100, 5, false))
+composites.push(new BaseRectangle(200, 300, 100, 50, 5, true))
+composites.push(new BaseRectangle(400, 300, 100, 50, 5, false))
 // composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
 composites.push(new BaseRectangle(width / 2, height, width, 1, Infinity, false, true))
 // composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))

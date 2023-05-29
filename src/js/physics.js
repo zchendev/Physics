@@ -1,8 +1,8 @@
 const composites = [];
 const config = {
     physics: {
-        friction: 0.01,
-        elasticity: 0,
+        friction: 0,
+        elasticity: 1,
     },
 }
 
@@ -112,25 +112,25 @@ class Collision {
 
         if (a instanceof BaseCircle) {
             axes.push(Collision.min_v(b, a.entity.p).subtract(a.entity.p).unit());
-            axes.push(b.entity.d.normal().unit());
+            axes.push(b.entity.d.normal());
             if (b instanceof BaseRectangle) axes.push(b.entity.d);
             return axes;
         }
 
         if(b instanceof BaseCircle){
             axes.push(Collision.min_v(a, b.entity.p).subtract(b.entity.p).unit());
-            axes.push(a.entity.d.normal().unit());
+            axes.push(a.entity.d.normal());
             if (a instanceof BaseRectangle) axes.push(a.entity.d);
             return axes;
         }
 
-        axes.push(a.entity.d.normal().unit());
+        axes.push(a.entity.d.normal());
 
         if (a instanceof BaseRectangle){
             axes.push(a.entity.d);
         }
 
-        axes.push(b.entity.d.normal().unit());
+        axes.push(b.entity.d.normal());
 
         if (b instanceof BaseRectangle){
             axes.push(b.entity.d);
@@ -237,7 +237,6 @@ class Collision {
     }
 
     cd() {
-        if (this.a.entity.i == 0 && this.b.entity.i == 0) return
         const c = Collision.hst(this.a, this.b);
         if (!c) return false;
         this.x = c.axis;
@@ -275,18 +274,6 @@ class Collision {
         this.a.entity.ω += this.a.μ * collArm1.cross(impulseVec);
         this.b.entity.ω -= this.b.μ * collArm2.cross(impulseVec);
     }
-
-    hst2() {
-        
-    }
-
-    cd2() {
-
-    }
-
-    // cr2() {
-    //     let relVel = closVel1.subtract(closVel2).dot(this.x) * -config.physics.elasticity;
-    // }
 }
 
 class Entity {
@@ -426,10 +413,10 @@ class BaseRectangle {
 
     update() {
         this.entity.update();
-        this.v[0] = this.entity.p.add(this.entity.d.multiply(-this.w / 2).add(this.entity.d.normal().unit().multiply(this.h / 2)))
-        this.v[1] = this.entity.p.add(this.entity.d.multiply(-this.w / 2).add(this.entity.d.normal().unit().multiply(-this.h / 2)))
-        this.v[2] = this.entity.p.add(this.entity.d.multiply(this.w / 2).add(this.entity.d.normal().unit().multiply(-this.h / 2)))
-        this.v[3] = this.entity.p.add(this.entity.d.multiply(this.w / 2).add(this.entity.d.normal().unit().multiply(this.h / 2)))
+        this.v[0] = this.entity.p.add(this.entity.d.multiply(-this.w / 2).add(this.entity.d.normal().multiply(this.h / 2)))
+        this.v[1] = this.entity.p.add(this.entity.d.multiply(-this.w / 2).add(this.entity.d.normal().multiply(-this.h / 2)))
+        this.v[2] = this.entity.p.add(this.entity.d.multiply(this.w / 2).add(this.entity.d.normal().multiply(-this.h / 2)))
+        this.v[3] = this.entity.p.add(this.entity.d.multiply(this.w / 2).add(this.entity.d.normal().multiply(this.h / 2)))
     }
 
     render(context) {
