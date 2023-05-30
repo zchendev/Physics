@@ -2,7 +2,7 @@ const composites = [];
 const global = [];
 const config = {
 	physics: {
-		friction: 0,
+		friction: 0.01,
 	},
 	global: {
 		unit: 50,

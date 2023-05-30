@@ -47,7 +47,10 @@ function update() {
 			}
 		}
 
-		if (gravity) composites[i].entity.v.y += 0.2;
+		if (gravity) {
+			composites[i].entity.v.y += 0.2;
+			composites[i].entity.v = composites[i].entity.v.multiply(1 - config.physics.friction);
+		}
 
 		composites[i].render(context);
 	}
