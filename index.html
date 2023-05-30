@@ -12,8 +12,89 @@
 		<script src="./src/js/renderer.js" defer></script>
 		<script src="./src/js/game.js" defer></script>
 	</head>
-	<body>
-		<canvas id="canvas-renderer" style="border: 1px solid black"></canvas>
+	<body oncontextmenu="return false">
+		<canvas style="float: left" id="canvas-renderer" style="border: 1px solid black"></canvas>
+		<div style="width: 20vw; float: left">
+			<table>
+				<tr>
+					<td onclick="newselect(9)">
+						<svg width="100" height="100">
+							<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+							<rect x="35" y="50" width="30" height="1" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" />
+						</svg>
+					</td>
+					<td onclick="newselect(10)">
+						<svg width="100" height="100">
+							<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+							<rect x="35" y="50" width="30" height="1" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" />
+							<rect x="50" y="35" width="1" height="30" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" />
+						</svg>
+					</td>
+					<td onclick="newselect(6)">
+						<svg width="100" height="100">
+							<polygon points="50,5 95,15 50,25 50, 95" style="fill:rgb(0,0,0);stroke:rgb(0, 0, 0);stroke-width:3;">
+						</svg>
+					</td>
+				</tr>
+				<tr>
+				  <td onclick="newselect(3)">
+					<svg width="100" height="100">
+						<rect x="5" y="5" width="90" height="90" style="fill:rgb(255, 255, 255);stroke-width:3;stroke:rgb(0,0,0)" />
+					</svg>
+					</td>
+					<td onclick="newselect(5)">
+						<svg width="100" height="100">
+							<polygon points="95,5 95,95 5,95" style="fill:rgb(255, 255, 255);stroke:rgb(0, 0, 0);stroke-width:3;">
+						</svg>
+					</td>
+					<td onclick="newselect(4)">
+						<svg width="100" height="100">
+							<polygon points="50,5 95,95 5,95" style="fill:rgb(255, 255, 255);stroke:rgb(0, 0, 0);stroke-width:3;">
+						</svg>
+					</td>
+				</tr>
+				<tr>
+					<td onclick="newselect(1)">
+						<svg width="100" height="100">
+							<rect x="5" y="5" width="90" height="90" style="fill:rgb(0, 255, 34);stroke-width:3;stroke:rgb(0,0,0)" />
+						</svg>
+					</td>
+					<td onclick="newselect(2)">
+						<svg width="100" height="100">
+							<rect x="5" y="5" width="90" height="90" style="fill:rgb(0, 157, 255);stroke-width:3;stroke:rgb(0,0,0)" />
+						</svg>
+					</td>
+					<td onclick="newselect(9)">
+						<svg width="100" height="100">
+							<rect x="5" y="5" width="90" height="90" style="fill:rgb(255, 0, 0);stroke-width:3;stroke:rgb(0,0,0)" />
+						</svg>
+					</td>
+				</tr>
+				<tr>
+					<td onclick="newselect(11)">
+						<svg width="100" height="100">
+							<rect x="5" y="5" width="90" height="90" style="fill:rgb(255, 255, 255);stroke-width:3;stroke:rgb(0,0,0)"/> 
+							<polygon points="30,30 70,50 30,70" style="fill:rgb(255, 255, 255);stroke:rgb(0, 0, 0);stroke-width:3;">
+						</svg>
+					</td>
+					<td onclick="newselect(7)">
+						<svg width="100" height="100">
+							<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+							<circle cx="50" cy="50" r="30" stroke="black" stroke-width="3" fill="white" />
+							<rect x="35" y="50" width="30" height="1" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" />
+						</svg>
+					</td>
+					<td onclick="newselect(8)">
+						<svg width="100" height="100">
+							<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+							<circle cx="50" cy="50" r="30" stroke="black" stroke-width="3" fill="white" />
+							<rect x="35" y="50" width="30" height="1" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" />
+							<rect x="50" y="35" width="1" height="30" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" />
+						</svg>
+					</td>
+				</tr>
+			</table>
+		</div>
 		<!-- <canvas id="canvas-viewport"></canvas> -->
 		<h1 id="ke"></h1>
 		<h1 id="p"></h1>
@@ -23,5 +104,8 @@
 		<textarea id="level"></textarea>
 		<button onclick="load()">Load</button>
 		<button onclick="exp()">Export</button>
+		<button onclick="clear_balls()">Clear Balls</button>
+		<button onclick="simulate_status(true)">Resume Simulation</button>
+		<button onclick="simulate_status(false)">Stop Simulation</button>
 	</body>
 </html>
