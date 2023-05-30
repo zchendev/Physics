@@ -78,10 +78,6 @@ function calculate(collisions) {
 	pr.innerHTML = "Collisions checked: " + collisions;
 }
 
-canvas.addEventListener("mousedown", (e) => {
-	composites.push(new BaseCircle(e.x, e.y, 10, 50, false));
-});
-
 function init() {
 	const c1 = new BaseSegment(0, 0, 0, height);
 	const c2 = new BaseSegment(0, 0, width, 0);

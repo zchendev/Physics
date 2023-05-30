@@ -384,6 +384,10 @@ class CompositeTriangle {
 		const s1 = new BaseSegment(x1, y1, x2, y2);
 		const s2 = new BaseSegment(x2, y2, x0, y0);
 
+		s0.entity.e = e;
+		s1.entity.e = e;
+		s2.entity.e = e;
+
 		composites.push(s0, s1, s2);
 	}
 }
@@ -413,24 +417,24 @@ class CompositeRectangle {
 
 class ComponentElasticUnit extends CompositeRectangle {
 	constructor(x, y) {
-		x *= config.global.unit;
-		y *= config.global.unit;
+		x = x * config.global.unit + config.global.unit / 2;
+		y = y * config.global.unit + config.global.unit / 2;
 		super(x, y, config.global.unit, config.global.unit, 1);
 	}
 }
 
 class ComponentInelasticUnit extends CompositeRectangle {
 	constructor(x, y) {
-		x *= config.global.unit;
-		y *= config.global.unit;
+		x = x * config.global.unit + config.global.unit / 2;
+		y = y * config.global.unit + config.global.unit / 2;
 		super(x, y, config.global.unit, config.global.unit, 0);
 	}
 }
 
 class ComponentStandardUnit extends CompositeRectangle {
 	constructor(x, y) {
-		x *= config.global.unit;
-		y *= config.global.unit;
+		x = x * config.global.unit + config.global.unit / 2;
+		y = y * config.global.unit + config.global.unit / 2;
 		super(x, y, config.global.unit, config.global.unit, 0.5);
 	}
 }
@@ -441,16 +445,16 @@ class ComponentSpikeUnit extends CompositeTriangle {
 		y *= config.global.unit;
 		switch (d % 4) {
 			default:
-				super(x, y + config.global.unit, x + config.global.unit / 2, y, x + config.global.unit, y + config.global.unit);
+				super(x, y + config.global.unit, x + config.global.unit / 2, y, x + config.global.unit, y + config.global.unit, 0);
 				break;
 			case 1:
-				super(x, y + config.global.unit, x + config.global.unit, y + config.global.unit / 2, x, y);
+				super(x, y + config.global.unit, x + config.global.unit, y + config.global.unit / 2, x, y, 0);
 				break;
 			case 2:
-				super(x, y, x + config.global.unit / 2, y + config.global.unit, x + config.global.unit, y);
+				super(x, y, x + config.global.unit / 2, y + config.global.unit, x + config.global.unit, y, 0);
 				break;
 			case 3:
-				super(x + config.global.unit, y, x, y + config.global.unit / 2, x + config.global.unit, y + config.global.unit);
+				super(x + config.global.unit, y, x, y + config.global.unit / 2, x + config.global.unit, y + config.global.unit, 0);
 				break;
 		}
 	}
@@ -462,16 +466,16 @@ class ComponentSlopeUnit extends CompositeTriangle {
 		y *= config.global.unit;
 		switch (d % 4) {
 			default:
-				super(x, y + config.global.unit, x + config.global.unit, y, x + config.global.unit, y + config.global.unit);
+				super(x, y + config.global.unit, x + config.global.unit, y, x + config.global.unit, y + config.global.unit, 0);
 				break;
 			case 1:
-				super(x, y, x + config.global.unit, y + config.global.unit, x, y + config.global.unit);
+				super(x, y, x + config.global.unit, y + config.global.unit, x, y + config.global.unit, 0);
 				break;
 			case 2:
-				super(x, y, x + config.global.unit, y, x, y + config.global.unit);
+				super(x, y, x + config.global.unit, y, x, y + config.global.unit, 0);
 				break;
 			case 3:
-				super(x, y, x + config.global.unit, y, x + config.global.unit, y + config.global.unit);
+				super(x, y, x + config.global.unit, y, x + config.global.unit, y + config.global.unit, 0);
 				break;
 		}
 	}
