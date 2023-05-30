@@ -2,8 +2,6 @@ class Vector {
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
-		// this.mag = Math.sqrt(x ** 2 + y ** 2);
-		// this.dir = Math.atan2(y, x);
 	}
 
 	add(vector) {
@@ -52,21 +50,6 @@ class Matrix {
 			}
 		}
 	}
-
-	// multiply(matrix) {
-	//     if (!this.c == matrix.r) {
-	//         console.error("Invalid Matrix Multiplication");
-	//         return;
-	//     }
-
-	//     const result = new Matrix(this.r, matrix.c);
-
-	//     for (let i = 0; i < this.r; i++) {
-	//         for (let k = 0; k < this.c; k++) {
-	//             result.content[]
-	//         }
-	//     }
-	// }
 
 	multiply_vector(vector) {
 		return new Vector(this.matrix[0][0] * vector.x + this.matrix[0][1] * vector.y, this.matrix[1][0] * vector.x + this.matrix[1][1] * vector.y);

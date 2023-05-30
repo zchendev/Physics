@@ -13,22 +13,9 @@ const py = document.querySelector("#py");
 const pr = document.querySelector("#pr");
 
 function update() {
-	// const start = performance.now();
-
 	context.clearRect(0, 0, width, height);
 	context.fillStyle = "black";
 	context.fillRect(0, 0, width, height);
-
-	// for (let i = 0; i < composites.length; i++) {
-	//     composite = composites[i];
-	//     if (composite.controllable) update_controls(composite);
-	//     composite.update();
-	//     for (let j = i + 1; j < composites.length; j++) {
-	//         const collision = new Collision(composite, composites[j]);
-	//         collision.solve();
-	//     }
-	//     composite.render(context);
-	// }
 
 	let collisions = 0;
 
@@ -40,7 +27,7 @@ function update() {
 
 		for (let j = i; j < composites.length; j++) {
 			if (!composites[i].entity.m && !composites[j].entity.m) continue;
-			// collisions++;
+			collisions++;
 
 			const prevy = composites[i].entity.v.y;
 
@@ -67,12 +54,9 @@ function update() {
 
 	for (let i = 0; i < global.length; i++) {
 		global[i].render(context);
-		collisions++;
 	}
 
 	calculate(collisions);
-
-	// pr.innerHTML = "Loop Instance Time: " + (performance.now() - start).toFixed(2);
 
 	requestAnimationFrame(update);
 }
@@ -116,19 +100,6 @@ function init() {
 composites.push(new BaseCircle(100, 100, 10, 25, true));
 composites.push(new BaseCircle(200, 200, 20, 25, false));
 composites.push(new BaseCircle(300, 200, 5, 25, false));
-
-// composites.push(new BaseSegment(100, 100, 200, 200));
-// composites.push(new BaseRectangle(200, 300, 100, 50, 5, true))
-// composites.push(new BaseRectangle(400, 300, 100, 50, 5, false))
-// composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
-// composites.push(new BaseRectangle(width / 2, height, width, 1, Infinity, false, true))
-// composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
-// composites.push(new BaseRectangle(0, height / 2, 1, height, Infinity, false))
-
-// const line = new BaseLine(100, 100, 200, 200);
-// const line2 = new BaseLine(100, 200, 200, 100);
-// const rect = new BaseRectangle(100, 100, 200, 300, true)
-// composites.push(rect);
 
 init();
 update();
