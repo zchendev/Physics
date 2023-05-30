@@ -136,12 +136,15 @@ canvas.addEventListener("mouseup", e => {
 	let p = pi.subtract(new Vector(e.offsetX, e.offsetY));
 
 	if (selected == -1) {
+		let set = false;
 		for (i in players) {
 			if (canapplyforce == 1) {
 				players[i].entity.v = players[i].entity.v.add(p.unit().multiply(20));
-				canapplyforce = 2;
+				set = true
 			} 
 		}
+
+		if (set) canapplyforce = 2;
 	}
 
 	pi = undefined;
