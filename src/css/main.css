@@ -1,0 +1,33 @@
+body,
+html {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: #000000;
+}
+
+canvas#canvas-renderer {
+	border: 1px solid #ffffff;
+}
+
+div#div-renderer {
+	float: left;
+	width: 80%;
+	height: 100%;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+div#div-renderer-wrapper {
+	width: 100%;
+	height: 60%;
+}
+
+div#div-stat {
+	float: left;
+	color: #ffffff;
+	width: 20%;
+}

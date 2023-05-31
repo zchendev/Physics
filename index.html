@@ -11,9 +11,29 @@
 		<script src="./src/js/controls.js" defer></script>
 		<script src="./src/js/renderer.js" defer></script>
 		<script src="./src/js/game.js" defer></script>
+
+        <link rel="stylesheet" href="./src/css/main.css">
 	</head>
 	<body oncontextmenu="return false">
-		<canvas style="float: left" id="canvas-renderer" style="border: 1px solid black"></canvas>
+		<div id="div-renderer-wrapper">
+            <div id="div-renderer">
+                <canvas id="canvas-renderer"></canvas>
+            </div>
+            <div id="div-stat">
+                <textarea id="level"></textarea>
+                <button onclick="load()">Load</button>
+                <button onclick="exp()">Export</button>
+                <button onclick="clear_balls()">Clear Balls</button>
+                <button onclick="simulate_status(true)">Resume Simulation</button>
+                <button onclick="simulate_status(false)">Stop Simulation</button>
+                <p id="ke"></h1>
+                <p id="p"></h1>
+                <p id="px"></h1>
+                <p id="py"></h1>
+                <p id="pr"></h1>
+                
+            </div>
+        </div>
 		<div style="width: 20vw; float: left">
 			<table>
 				<tr>
@@ -96,16 +116,5 @@
 			</table>
 		</div>
 		<!-- <canvas id="canvas-viewport"></canvas> -->
-		<h1 id="ke"></h1>
-		<h1 id="p"></h1>
-		<h1 id="px"></h1>
-		<h1 id="py"></h1>
-		<h1 id="pr"></h1>
-		<textarea id="level"></textarea>
-		<button onclick="load()">Load</button>
-		<button onclick="exp()">Export</button>
-		<button onclick="clear_balls()">Clear Balls</button>
-		<button onclick="simulate_status(true)">Resume Simulation</button>
-		<button onclick="simulate_status(false)">Stop Simulation</button>
 	</body>
 </html>

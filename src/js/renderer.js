@@ -90,7 +90,7 @@ function calculate(collisions) {
 		mx += composites[i].entity.v.x * composites[i].entity.m;
 		my += composites[i].entity.v.y * composites[i].entity.m;
 	}
-	ke.innerHTML = "Mechanical Energy: " + k.toFixed(2);
+	ke.innerHTML = "Kinetic Energy: " + k.toFixed(2);
 	p.innerHTML = "Momentum: " + new Vector(mx, my).magnitude().toFixed(2);
 	px.innerHTML = "Momentum X: " + mx.toFixed(2);
 	py.innerHTML = "Momentum Y: " + my.toFixed(2);
