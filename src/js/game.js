@@ -99,13 +99,12 @@ document.addEventListener("keydown", (select) => {
 
 canvas.addEventListener("mousemove", (e) => {
 	if (!pi) return;
+	av = pi.subtract(new Vector(e.offsetX, e.offsetY));
 	pi.subtract(new Vector(e.offsetX, e.offsetY)).render(context, pi.x, pi.y);
 });
 
-let xi, yi;
+let xi, yi; let av;
 let pi;
-
-let md = false;
 
 canvas.addEventListener("mousedown", (e) => {
 	var x = Math.floor(e.offsetX / 50);

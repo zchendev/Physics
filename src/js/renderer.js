@@ -72,8 +72,16 @@ async function update() {
 
 	calculate(collisions);
 
+	if (md) {
+		for (let i = 0; i < players.length; i++) {
+			if (av) canvas_arrow(context, players[i].entity.p.x, players[i].entity.p.y, av.x + players[i].entity.p.x, av.y + players[i].entity.p.y);
+		}
+	}
+
 	if (config.engine.simulate) requestAnimationFrame(update);
 }
+
+let md = false;
 
 function simulate_status(status) {
 	config.engine.simulate = status;
