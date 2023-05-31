@@ -21,12 +21,14 @@ function update() {
 
 	for (let i = 0; i < composites.length; i++) {
 		if (composites[i].controllable) update_controls(composites[i]);
+		if (!composites[i].entity.c) continue;
 		composites[i].update();
 
 		let gravity = false;
 
 		for (let j = i; j < composites.length; j++) {
 			if (!composites[i].entity.m && !composites[j].entity.m) continue;
+			if (!composites[j].entity.c) continue;
 			collisions++;
 
 			const prevy = composites[i].entity.v.y;
@@ -96,9 +98,9 @@ function init() {
 	composites.push(c4);
 }
 
-composites.push(new BaseCircle(100, 100, 10, 25, true));
-composites.push(new BaseCircle(200, 200, 20, 25, false));
-composites.push(new BaseCircle(300, 200, 5, 25, false));
+composites.push(new BaseCircle(100, 100, 10, 100, true));
+// composites.push(new BaseCircle(200, 200, 20, 100, false));
+// composites.push(new BaseCircle(300, 200, 5, 100, false));
 
 init();
 update();

@@ -45,7 +45,7 @@ class MapObject {
 		this.i = i;
 		this.x = x;
 		this.y = y;
-		this.r = r;
+		this.r = r % 4;
 	}
 
 	to_string() {
@@ -83,4 +83,22 @@ canvas.addEventListener("mousedown", (e) => {
 		delete level[y][x];
 		level[y][x] = undefined;
 	}
+	update_collison_status();
 });
+
+function update_collison_status() {
+	for (let i = 0; i < config.global.height; i++) {
+		if (!level[i]) continue;
+		for (let k = 0; k < config.global.width; k++) {
+			if (!level[i] || !level[i][k]) continue;
+			if (level[i] && level[i][k - 1] && level[i][k].object.c[level[i][k].r]) level[i][k].object.s0.entity.c = false;
+			else level[i][k].object.s0.entity.c = true;
+			if (level[i] && level[i][k + 1] && level[i][k].object.c[level[i][k].r]) level[i][k].object.s2.entity.c = false;
+			else level[i][k].object.s2.entity.c = true;
+			if (level[i - 1] && level[i - 1][k] && level[i][k].object.c[level[i][k].r]) level[i][k].object.s1.entity.c = false;
+			else level[i][k].object.s1.entity.c = true;
+			if (level[i + 1] && level[i + 1][k] && level[i][k].object.c[level[i][k].r]) level[i][k].object.s3.entity.c = false;
+			else level[i][k].object.s3.entity.c = true;
+		}
+	}
+}

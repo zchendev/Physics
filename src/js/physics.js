@@ -297,6 +297,7 @@ class Entity {
 		this.ω = 0;
 		this.e = 1; // Elasticity
 		this.q = 1;
+		this.c = true;
 	}
 
 	update() {
@@ -366,6 +367,7 @@ class BaseSegment {
 	update() {}
 
 	render(context) {
+		if (!this.entity.c) return;
 		// const rotation = Matrix.rotation_matrix(this.entity.θ).multiply_vector(this.reference);
 		// this.a = this.c.add(rotation.multiply(this.l * -0.5));
 		// this.b = this.c.add(rotation.multiply(this.l * 0.5));
@@ -380,38 +382,38 @@ class BaseSegment {
 
 class CompositeTriangle {
 	constructor(x0, y0, x1, y1, x2, y2, e) {
-		const s0 = new BaseSegment(x0, y0, x1, y1);
-		const s1 = new BaseSegment(x1, y1, x2, y2);
-		const s2 = new BaseSegment(x2, y2, x0, y0);
+		this.s0 = new BaseSegment(x0, y0, x1, y1);
+		this.s1 = new BaseSegment(x1, y1, x2, y2);
+		this.s2 = new BaseSegment(x2, y2, x0, y0);
 
-		s0.entity.e = e;
-		s1.entity.e = e;
-		s2.entity.e = e;
+		this.s0.entity.e = e;
+		this.s1.entity.e = e;
+		this.s2.entity.e = e;
 
-		composites.push(s0, s1, s2);
+		composites.push(this.s0, this.s1, this.s2);
 	}
 }
 
 class CompositeRectangle {
 	constructor(cx, cy, w, h, e) {
-		const s0 = new BaseSegment(cx - w / 2, cy + h / 2, cx - w / 2, cy - h / 2);
-		const s1 = new BaseSegment(cx - w / 2, cy - h / 2, cx + w / 2, cy - h / 2);
-		const s2 = new BaseSegment(cx + w / 2, cy + h / 2, cx + w / 2, cy - h / 2);
-		const s3 = new BaseSegment(cx + w / 2, cy + h / 2, cx - w / 2, cy + h / 2);
+		this.s0 = new BaseSegment(cx - w / 2, cy + h / 2, cx - w / 2, cy - h / 2);
+		this.s1 = new BaseSegment(cx - w / 2, cy - h / 2, cx + w / 2, cy - h / 2);
+		this.s2 = new BaseSegment(cx + w / 2, cy + h / 2, cx + w / 2, cy - h / 2);
+		this.s3 = new BaseSegment(cx + w / 2, cy + h / 2, cx - w / 2, cy + h / 2);
 
 		if (typeof e == "object") {
-			s0.entity.e = e[0];
-			s1.entity.e = e[1];
-			s2.entity.e = e[2];
-			s3.entity.e = e[3];
+			this.s0.entity.e = e[0];
+			this.s1.entity.e = e[1];
+			this.s2.entity.e = e[2];
+			this.s3.entity.e = e[3];
 		} else {
-			s0.entity.e = e;
-			s1.entity.e = e;
-			s2.entity.e = e;
-			s3.entity.e = e;
+			this.s0.entity.e = e;
+			this.s1.entity.e = e;
+			this.s2.entity.e = e;
+			this.s3.entity.e = e;
 		}
 
-		composites.push(s0, s1, s2, s3);
+		composites.push(this.s0, this.s1, this.s2, this.s3);
 	}
 }
 
@@ -420,6 +422,7 @@ class ComponentElasticUnit extends CompositeRectangle {
 		x = x * config.global.unit + config.global.unit / 2;
 		y = y * config.global.unit + config.global.unit / 2;
 		super(x, y, config.global.unit, config.global.unit, 1);
+		this.c = [1, 1, 1, 1];
 	}
 }
 
@@ -428,6 +431,7 @@ class ComponentInelasticUnit extends CompositeRectangle {
 		x = x * config.global.unit + config.global.unit / 2;
 		y = y * config.global.unit + config.global.unit / 2;
 		super(x, y, config.global.unit, config.global.unit, 0);
+		this.c = [1, 1, 1, 1];
 	}
 }
 
@@ -436,6 +440,7 @@ class ComponentStandardUnit extends CompositeRectangle {
 		x = x * config.global.unit + config.global.unit / 2;
 		y = y * config.global.unit + config.global.unit / 2;
 		super(x, y, config.global.unit, config.global.unit, 0.5);
+		this.c = [1, 1, 1, 1];
 	}
 }
 
@@ -446,15 +451,19 @@ class ComponentSpikeUnit extends CompositeTriangle {
 		switch (d % 4) {
 			default:
 				super(x, y + config.global.unit, x + config.global.unit / 2, y, x + config.global.unit, y + config.global.unit, 0);
+				this.c = [0, 0, 0, 1];
 				break;
 			case 1:
 				super(x, y + config.global.unit, x + config.global.unit, y + config.global.unit / 2, x, y, 0);
+				this.c = [1, 0, 0, 0];
 				break;
 			case 2:
 				super(x, y, x + config.global.unit / 2, y + config.global.unit, x + config.global.unit, y, 0);
+				this.c = [0, 1, 0, 0];
 				break;
 			case 3:
 				super(x + config.global.unit, y, x, y + config.global.unit / 2, x + config.global.unit, y + config.global.unit, 0);
+				this.c = [0, 0, 1, 0];
 				break;
 		}
 	}
@@ -467,15 +476,19 @@ class ComponentSlopeUnit extends CompositeTriangle {
 		switch (d % 4) {
 			default:
 				super(x, y + config.global.unit, x + config.global.unit, y, x + config.global.unit, y + config.global.unit, 0);
+				this.c = [0, 0, 1, 1];
 				break;
 			case 1:
 				super(x, y, x + config.global.unit, y + config.global.unit, x, y + config.global.unit, 0);
+				this.c = [1, 0, 0, 1];
 				break;
 			case 2:
 				super(x, y, x + config.global.unit, y, x, y + config.global.unit, 0);
+				this.c = [1, 1, 0, 0];
 				break;
 			case 3:
 				super(x, y, x + config.global.unit, y, x + config.global.unit, y + config.global.unit, 0);
+				this.c = [0, 1, 1, 0];
 				break;
 		}
 	}
