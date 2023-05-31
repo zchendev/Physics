@@ -36,6 +36,10 @@ class Vector {
 	cross(vector) {
 		return this.x * vector.y - this.y * vector.x;
 	}
+
+	render(context, x0, y0) {
+		canvas_arrow(context, x0, y0, this.x, this.y);
+	}
 }
 
 class Matrix {

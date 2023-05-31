@@ -12,7 +12,7 @@ const px = document.querySelector("#px");
 const py = document.querySelector("#py");
 const pr = document.querySelector("#pr");
 
-function update() {
+async function update() {
 	context.clearRect(0, 0, width, height);
 	context.fillStyle = "black";
 	context.fillRect(0, 0, width, height);
@@ -20,15 +20,18 @@ function update() {
 	let collisions = 0;
 
 	for (let i = 0; i < composites.length; i++) {
+		if (!composites[i]) continue;
 		if (composites[i].controllable) update_controls(composites[i]);
-		if (!composites[i].entity.c) continue;
+		// if (!composites[i].entity.c) continue;
 		composites[i].update();
 
 		let gravity = false;
 
 		for (let j = i; j < composites.length; j++) {
+			if (!composites[j]) continue;
+			// if (!composites[i].entity.c || !composites[j].entity.c) continue;
 			if (!composites[i].entity.m && !composites[j].entity.m) continue;
-			if (!composites[j].entity.c) continue;
+			// if (!composites[j].entity.c) continue;
 			collisions++;
 
 			const prevy = composites[i].entity.v.y;
@@ -36,6 +39,12 @@ function update() {
 			if (Collision.collision.cd[composites[i].type][composites[j].type](composites[i], composites[j])) {
 				Collision.collision.pr[composites[i].type][composites[j].type](composites[i], composites[j]);
 				Collision.collision.cr[composites[i].type][composites[j].type](composites[i], composites[j]);
+				if (composites[i].controllable || composites[j].controllable) {
+					canapplyforce = 1;
+				}
+
+				if ((composites[i].entity.s === 1 || composites[j].entity.s === 1) && (composites[i].controllable || composites[j].controllable)) console.log("you win");
+				if (composites[i].entity.s === 2 || composites[j].entity.s === 2) console.log("you lose");
 			}
 
 			const postvy = composites[i].entity.v.y;
@@ -50,7 +59,7 @@ function update() {
 		}
 
 		if (gravity) {
-			composites[i].entity.v.y += 0.2;
+			composites[i].entity.v.y += config.physics.gravity_differential;
 			composites[i].entity.v = composites[i].entity.v.multiply(1 - config.physics.friction);
 		}
 
@@ -63,7 +72,12 @@ function update() {
 
 	calculate(collisions);
 
-	requestAnimationFrame(update);
+	if (config.engine.simulate) requestAnimationFrame(update);
+}
+
+function simulate_status(status) {
+	config.engine.simulate = status;
+	if (status) update();
 }
 
 function calculate(collisions) {
@@ -71,7 +85,7 @@ function calculate(collisions) {
 	let mx = 0;
 	let my = 0;
 	for (i in composites) {
-		if (composites[i].type) continue;
+		if (!composites[i] || composites[i].type) continue;
 		k += 0.5 * composites[i].entity.v.magnitude() ** 2 * composites[i].entity.m + 0.5 * (1 / composites[i].μ) * composites[i].entity.ω ** 2;
 		mx += composites[i].entity.v.x * composites[i].entity.m;
 		my += composites[i].entity.v.y * composites[i].entity.m;
@@ -83,7 +97,37 @@ function calculate(collisions) {
 	pr.innerHTML = "Collisions checked: " + collisions;
 }
 
+function clear_balls() {
+	for (let i = 0; i < composites.length; i++) {
+		if (composites[i] instanceof BaseCircle) composites[i] = null;
+	}
+
+	for (let i = 0; i < config.global.height; i++) {
+		for (let k = 0; k < config.global.width; k++) {
+			if (level[i][k] && level[i][k].object instanceof ComponentPlayer) level[i][k] = null;
+		}
+	}
+}
+
+function canvas_arrow(context, fromx, fromy, tox, toy) {
+	var headlen = 10; // length of head in pixels
+	var dx = tox - fromx;
+	var dy = toy - fromy;
+	var angle = Math.atan2(dy, dx);
+	context.beginPath();
+	context.lineStyle = "white";
+	context.moveTo(fromx, fromy);
+	context.lineTo(tox, toy);
+	context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+	context.moveTo(tox, toy);
+	context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+	context.stroke();
+	context.closePath();
+}
+
 function init() {
+	// composites.push(new BaseCircle(200, 200, 20, 25));
+	// composites.push(new BaseCircle(300, 200, 5, 25));
 	const c1 = new BaseSegment(0, 0, 0, height);
 	const c2 = new BaseSegment(0, 0, width, 0);
 	const c3 = new BaseSegment(width, 0, width, height);
@@ -98,9 +142,5 @@ function init() {
 	composites.push(c4);
 }
 
-composites.push(new BaseCircle(100, 100, 10, 100, true));
-// composites.push(new BaseCircle(200, 200, 20, 100, false));
-// composites.push(new BaseCircle(300, 200, 5, 100, false));
-
-init();
+// init();
 update();

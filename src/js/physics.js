@@ -3,11 +3,15 @@ const global = [];
 const config = {
 	physics: {
 		friction: 0.01,
+		gravity_differential: 0.2,
 	},
 	global: {
 		unit: 50,
 		width: 20,
 		height: 10,
+	},
+	engine: {
+		simulate: true,
 	},
 };
 
@@ -80,7 +84,7 @@ class Collision {
 		c.entity.p = c.entity.p.add(penetration.unit().multiply(c.r - penetration.magnitude()));
 	}
 
-	// Segment to Circle Collision Detection
+	// Segment to Circle Collision Resolution
 	static s2c_cr(s, c) {
 		const normal = c.entity.p.subtract(Collision.cscp(c, s)).unit();
 		c.entity.v = c.entity.v.add(normal.multiply(c.entity.v.dot(normal) * -(1 + Math.min(s.entity.e, c.entity.e))));
@@ -296,8 +300,9 @@ class Entity {
 		this.θ = 0;
 		this.ω = 0;
 		this.e = 1; // Elasticity
-		this.q = 1;
-		this.c = true;
+		this.q = 1; // Charge
+		this.c = true; // Collidable
+		this.s = 0; // special properties
 	}
 
 	update() {
@@ -315,13 +320,13 @@ class Entity {
 }
 
 class BaseCircle {
-	constructor(x, y, m, r, controllable = false) {
+	constructor(x, y, m, r) {
 		this.type = 0;
 		this.r = r;
 		this.v = [];
 		this.entity = new Entity(x, y, m);
 		this.μ = 1 / (m * r ** 2);
-		this.controllable = controllable;
+		this.controllable = false;
 	}
 
 	update() {
@@ -331,7 +336,7 @@ class BaseCircle {
 	render(context) {
 		context.beginPath();
 		context.arc(this.entity.p.x, this.entity.p.y, this.r, 0 + this.entity.θ, Math.PI / 6 + this.entity.θ);
-		context.strokeStyle = "red";
+		context.strokeStyle = this.controllable ? "red" : "white";
 		context.stroke();
 		context.closePath();
 		context.beginPath();
@@ -341,7 +346,7 @@ class BaseCircle {
 		context.closePath();
 		context.beginPath();
 		context.arc(this.entity.p.x, this.entity.p.y, this.r, (11 * Math.PI) / 6 + this.entity.θ, 2 * Math.PI + this.entity.θ);
-		context.strokeStyle = "red";
+		context.strokeStyle = this.controllable ? "red" : "white";
 		context.stroke();
 		context.closePath();
 	}
@@ -360,6 +365,7 @@ class BaseSegment {
 		this.v[0] = this.a;
 		this.v[1] = this.b;
 		this.μ = 0;
+		this.o = "rgb(255, 255, 255)";
 
 		this.reference = this.b.subtract(this.a).unit();
 	}
@@ -367,12 +373,12 @@ class BaseSegment {
 	update() {}
 
 	render(context) {
-		if (!this.entity.c) return;
+		// if (!this.entity.c) return;
 		// const rotation = Matrix.rotation_matrix(this.entity.θ).multiply_vector(this.reference);
 		// this.a = this.c.add(rotation.multiply(this.l * -0.5));
 		// this.b = this.c.add(rotation.multiply(this.l * 0.5));
 		context.beginPath();
-		context.strokeStyle = "white";
+		context.strokeStyle = this.o;
 		context.moveTo(this.a.x, this.a.y);
 		context.lineTo(this.b.x, this.b.y);
 		context.stroke();
@@ -381,7 +387,7 @@ class BaseSegment {
 }
 
 class CompositeTriangle {
-	constructor(x0, y0, x1, y1, x2, y2, e) {
+	constructor(x0, y0, x1, y1, x2, y2, e, color) {
 		this.s0 = new BaseSegment(x0, y0, x1, y1);
 		this.s1 = new BaseSegment(x1, y1, x2, y2);
 		this.s2 = new BaseSegment(x2, y2, x0, y0);
@@ -390,12 +396,21 @@ class CompositeTriangle {
 		this.s1.entity.e = e;
 		this.s2.entity.e = e;
 
+		if (color) {
+			this.s0.o = color;
+			this.s1.o = color;
+			this.s2.o = color;
+		}
+
+		this.i = composites.length;
+		this.s = 3;
+
 		composites.push(this.s0, this.s1, this.s2);
 	}
 }
 
 class CompositeRectangle {
-	constructor(cx, cy, w, h, e) {
+	constructor(cx, cy, w, h, e, color) {
 		this.s0 = new BaseSegment(cx - w / 2, cy + h / 2, cx - w / 2, cy - h / 2);
 		this.s1 = new BaseSegment(cx - w / 2, cy - h / 2, cx + w / 2, cy - h / 2);
 		this.s2 = new BaseSegment(cx + w / 2, cy + h / 2, cx + w / 2, cy - h / 2);
@@ -413,6 +428,16 @@ class CompositeRectangle {
 			this.s3.entity.e = e;
 		}
 
+		if (color) {
+			this.s0.o = color;
+			this.s1.o = color;
+			this.s2.o = color;
+			this.s3.o = color;
+		}
+
+		this.i = composites.length;
+		this.s = 4;
+
 		composites.push(this.s0, this.s1, this.s2, this.s3);
 	}
 }
@@ -421,7 +446,7 @@ class ComponentElasticUnit extends CompositeRectangle {
 	constructor(x, y) {
 		x = x * config.global.unit + config.global.unit / 2;
 		y = y * config.global.unit + config.global.unit / 2;
-		super(x, y, config.global.unit, config.global.unit, 1);
+		super(x, y, config.global.unit, config.global.unit, 1, "rgb(0, 255, 0)");
 		this.c = [1, 1, 1, 1];
 	}
 }
@@ -430,7 +455,7 @@ class ComponentInelasticUnit extends CompositeRectangle {
 	constructor(x, y) {
 		x = x * config.global.unit + config.global.unit / 2;
 		y = y * config.global.unit + config.global.unit / 2;
-		super(x, y, config.global.unit, config.global.unit, 0);
+		super(x, y, config.global.unit, config.global.unit, 0, "rgb(0, 191, 255)");
 		this.c = [1, 1, 1, 1];
 	}
 }
@@ -450,22 +475,26 @@ class ComponentSpikeUnit extends CompositeTriangle {
 		y *= config.global.unit;
 		switch (d % 4) {
 			default:
-				super(x, y + config.global.unit, x + config.global.unit / 2, y, x + config.global.unit, y + config.global.unit, 0);
+				super(x, y + config.global.unit, x + config.global.unit / 2, y, x + config.global.unit, y + config.global.unit, 0, "rgb(0, 191, 255)");
 				this.c = [0, 0, 0, 1];
 				break;
 			case 1:
-				super(x, y + config.global.unit, x + config.global.unit, y + config.global.unit / 2, x, y, 0);
+				super(x, y + config.global.unit, x + config.global.unit, y + config.global.unit / 2, x, y, 0, "rgb(0, 191, 255)");
 				this.c = [1, 0, 0, 0];
 				break;
 			case 2:
-				super(x, y, x + config.global.unit / 2, y + config.global.unit, x + config.global.unit, y, 0);
+				super(x, y, x + config.global.unit / 2, y + config.global.unit, x + config.global.unit, y, 0, "rgb(0, 191, 255)");
 				this.c = [0, 1, 0, 0];
 				break;
 			case 3:
-				super(x + config.global.unit, y, x, y + config.global.unit / 2, x + config.global.unit, y + config.global.unit, 0);
+				super(x + config.global.unit, y, x, y + config.global.unit / 2, x + config.global.unit, y + config.global.unit, 0, "rgb(0, 191, 255)");
 				this.c = [0, 0, 1, 0];
 				break;
 		}
+
+		this.s0.entity.s = 2;
+		this.s1.entity.s = 2;
+		this.s2.entity.s = 2;
 	}
 }
 
@@ -475,22 +504,95 @@ class ComponentSlopeUnit extends CompositeTriangle {
 		y *= config.global.unit;
 		switch (d % 4) {
 			default:
-				super(x, y + config.global.unit, x + config.global.unit, y, x + config.global.unit, y + config.global.unit, 0);
-				this.c = [0, 0, 1, 1];
-				break;
-			case 1:
-				super(x, y, x + config.global.unit, y + config.global.unit, x, y + config.global.unit, 0);
-				this.c = [1, 0, 0, 1];
-				break;
-			case 2:
-				super(x, y, x + config.global.unit, y, x, y + config.global.unit, 0);
+				super(x, y + config.global.unit, x + config.global.unit, y, x + config.global.unit, y + config.global.unit, 0, "rgb(0, 191, 255)");
 				this.c = [1, 1, 0, 0];
 				break;
-			case 3:
-				super(x, y, x + config.global.unit, y, x + config.global.unit, y + config.global.unit, 0);
+			case 1:
+				super(x, y, x + config.global.unit, y + config.global.unit, x, y + config.global.unit, 0, "rgb(0, 191, 255)");
 				this.c = [0, 1, 1, 0];
 				break;
+			case 2:
+				super(x, y, x + config.global.unit, y, x, y + config.global.unit, 0, "rgb(0, 191, 255)");
+				this.c = [0, 0, 1, 1];
+				break;
+			case 3:
+				super(x, y, x + config.global.unit, y, x + config.global.unit, y + config.global.unit, 0, "rgb(0, 191, 255)");
+				this.c = [1, 0, 0, 1];
+				break;
 		}
+	}
+}
+
+class ComponentFlagUnit {
+	constructor(x, y) {
+		x *= config.global.unit;
+		y *= config.global.unit;
+		const s0 = new BaseSegment(x + config.global.unit / 3, y + config.global.unit, x + config.global.unit / 3, y - config.global.unit);
+		const s1 = new BaseSegment(x + config.global.unit / 3, y - config.global.unit, x + config.global.unit, y - config.global.unit / 2);
+		const s2 = new BaseSegment(x + config.global.unit, y - config.global.unit / 2, x + config.global.unit / 3, y - config.global.unit / 2);
+
+		s0.entity.s = 1;
+		s1.entity.s = 1;
+		s2.entity.s = 1;
+
+		composites.push(s0, s1, s2);
+	}
+}
+
+class ComponentCircle {
+	constructor(x, y, q) {
+		x *= config.global.unit;
+		y *= config.global.unit;
+
+		this.circle = new BaseCircle(x + config.global.unit / 2, y + config.global.unit / 2, 5, config.global.unit / 2);
+		this.circle.entity.q = q;
+
+		spawn_player(this.circle, false);
+		composites.unshift(this.circle);
+	}
+}
+
+class ComponentCircleNegative extends ComponentCircle {
+	constructor(x, y) {
+		super(x, y, -1);
+	}
+}
+
+class ComponentCirclePositive extends ComponentCircle {
+	constructor(x, y) {
+		super(x, y, 1);
+	}
+}
+
+class ComponentPlayer extends BaseCircle {
+	constructor(x, y, q) {
+		x *= config.global.unit;
+		y *= config.global.unit;
+		super(x + config.global.unit / 2, y + config.global.unit / 2, 5, config.global.unit / 2);
+		this.controllable = true;
+		this.entity.q = q;
+
+		spawn_player(this, true);
+		composites.unshift(this);
+	}
+}
+
+class ComponentPlayerNegative extends ComponentPlayer {
+	constructor(x, y) {
+		super(x, y, -1);
+	}
+}
+
+class ComponentPlayerPositive extends ComponentPlayer {
+	constructor(x, y) {
+		super(x, y, 1);
+	}
+}
+
+class ComponentMagneticInductor {
+	constructor(x, y) {
+		this.field = new ComponentFieldUniform(x - 2, y - 2, 5, 5, 0, 1);
+		this.box = new ComponentStandardUnit(x, y);
 	}
 }
 
@@ -524,12 +626,12 @@ class ComponentFieldUniform {
 		} else {
 			o.entity.v = o.entity.v
 				.add(
-					Matrix.rotation_matrix((Math.PI / 2) * 3)
+					Matrix.rotation_matrix(Math.PI / 2)
 						.multiply_vector(o.entity.v)
 						.multiply(o.entity.q * o.entity.v.magnitude() * 0.01 * this.b)
 				)
 				.unit()
-				.multiply(-m);
+				.multiply(m);
 		}
 	}
 
