@@ -12,6 +12,8 @@ const px = document.querySelector("#px");
 const py = document.querySelector("#py");
 const pr = document.querySelector("#pr");
 
+let gravitation = true;
+
 async function update() {
 	context.clearRect(0, 0, width, height);
 	context.fillStyle = "black";
@@ -58,7 +60,7 @@ async function update() {
 			}
 		}
 
-		if (gravity) {
+		if (gravity && config.engine.gravitation) {
 			composites[i].entity.v.y += config.physics.gravity_differential;
 			composites[i].entity.v = composites[i].entity.v.multiply(1 - config.physics.friction);
 		}

@@ -12,6 +12,8 @@ const config = {
 	},
 	engine: {
 		simulate: true,
+		gravitation: true,
+		magnetic_box: true,
 	},
 };
 
@@ -592,7 +594,7 @@ class ComponentPlayerPositive extends ComponentPlayer {
 class ComponentMagneticInductor {
 	constructor(x, y) {
 		this.field = new ComponentFieldUniform(x - 2, y - 2, 5, 5, 0, 1);
-		this.box = new ComponentStandardUnit(x, y);
+		if (config.engine.magnetic_box) this.box = new ComponentStandardUnit(x, y);
 	}
 }
 
